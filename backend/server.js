@@ -123,6 +123,11 @@ app.post('/login', async (req, res, next) => {
 // Allows a user to make a post only to their account 
 /** One user can have many posts */
 app.post('/posts', setUser, async (req, res, next) => {
+  /* 
+  By using setUser, user will not be able to make a post if 
+  token is not valid
+  */
+
   // Require a user and set the post's ownerID
   const { title, author, content, date } = req.body;
   const post = await Post.create({ title, author, content, date, ownerId: req.user.id });
