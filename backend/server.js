@@ -46,13 +46,12 @@ const setUser = ((req, res, next) => {
 // Route Handlers 
 
 // Get
-
 app.get('/', async (req, res, next) => {
   try {
     res.send(`
-      <h1>Welcome to My Diary!</h1>
-      <p>Please go to Postman to test the routes</a></p>
-      <p>Log in via POST /login or register via POST /register</p>
+    <h1>Welcome to My Diary!</h1>
+    <p>Please go to Postman to test the routes</a></p>
+    <p>Log in via POST /login or register via POST /register</p>
     `);
   } catch (error) {
     console.error(error);
@@ -200,9 +199,33 @@ app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
 })
 
 
-
 /* User can delete a single post */
+app.delete('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
+  const { ownerId, postId } = req.params;
 
+  // Looking for a post by id and postId to delete
+  try {
+    const post = await Post.findOne({ where: { id: postId, ownerId } });
+    if (!post) {
+      res.sendStatus(404);
+    }
+
+    // Check if the user owns found post
+    if (post.ownerId !== req.user.id) {
+      res.sendStatus(401)
+      return;
+    }
+
+    // Delete the found post
+    await post.destroy();
+    res.json({ message: 'Post has been deleted!', post: post })
+
+  } catch (error) {
+    console.log(error.mesage);
+    res.sendStatus(500)
+    next(error);
+  }
+})
 
 
 app.listen(PORT, () => {
