@@ -165,7 +165,7 @@ app.get('/posts/:ownerId', setUser, async (req, res, next) => {
 
 
 /* Allow user to edit their post */
-app.put('posts/:ownerId/:postId', setUser, async (req, res, next) => {
+app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
   const { ownerId, postId } = req.params;
   const { title, content } = req.body;
 
