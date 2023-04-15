@@ -228,6 +228,35 @@ app.delete('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
 })
 
 
+/* User can delete their own account */
+app.delete('/users/:id', setUser, async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    // Users have id, searching for the user by id
+    const user = await User.findByPk(id);
+
+    // See if the found User exits in the database
+    if (!user) {
+      res.sendStatus(404)
+      return;
+    }
+    if (user.id !== req.user.id) {
+      res.sendStatus(401)
+    }
+
+    // Delete the user that was found and send message
+    await user.destroy();
+    res.json({ mesage: 'User has been deleted' })
+
+  } catch (error) {
+    console.log(error.mesage)
+    res.sendStatus(500)
+    next(error);
+  }
+})
+
+
 app.listen(PORT, () => {
   sequelize.sync({ force: false });
   console.log(`Users are ready at http://localhost:${PORT}`);
