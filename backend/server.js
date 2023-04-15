@@ -167,7 +167,7 @@ app.get('/posts/:ownerId', setUser, async (req, res, next) => {
 
 
 /* Allow use to read one post */
-app.get('/posts/:ownerId/:postId', async (req, res, next) => {
+app.get('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
   const { ownerId, postId } = req.params;
 
   try {
@@ -179,6 +179,8 @@ app.get('/posts/:ownerId/:postId', async (req, res, next) => {
 
     // Check if the user owns the post
     if (post.ownerId !== req.user.id) {
+      console.log(post.ownerId);
+      console.log(ownerId);
       res.sendStatus(401)
       return;
     }
