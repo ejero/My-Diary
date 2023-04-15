@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { sequelize } = require('./database/db');
+const { sequelize, Sequelize } = require('./database/db');
 const { User, Post } = require('./database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -29,6 +29,9 @@ const setUser = ((req, res, next) => {
     try {
       const userObj = jwt.verify(token, process.env.JWT_SECRET);
       req.user = userObj;
+
+      // Sets the owner id from an authenticated user
+      req.params.ownerId = userObj.id;
       next();
     } catch (error) {
       console.error(error.message);
@@ -71,9 +74,15 @@ app.post('/register', async (req, res) => {
 
 // Alows a usr to login 
 app.post('/login', async (req, res, next) => {
+  // User can login by username or password
   try {
-    const { email, password } = req.body;
-    const foundUser = await User.findOne({ where: { email } });
+    const { emailOrUsername, password } = req.body;
+    const foundUser = await User.findOne({
+      where: Sequelize.or(
+        { email: emailOrUsername },
+        { username: emailOrUsername }
+      )
+    })
 
     if (!foundUser) {
       res.send(400).send("incorrect username or password");
@@ -114,34 +123,50 @@ app.post('/posts', setUser, async (req, res, next) => {
 })
 
 /* User can view all their posts */
-app.get('/posts/:userId', setUser, async (req, res, next) => {
+app.get('/posts/:ownerId', setUser, async (req, res, next) => {
   try {
-    const userId = req.params.id;
-    if (userId !== req.user.id) {
+    const ownerId = req.params.ownerId;
+    const user = await User.findOne({ where: { id: ownerId } })
+
+    // If user is not found by id
+    if (!user) {
+      res.sendStatus(404);
+      return;
+    }
+
+    // If user found matches the id
+    if (user.id !== req.user.id) {
+      console.log(req.user);
       res.sendStatus(401)
       return;
     }
+
     /* Find all, retrive all post from user with ownerId of same logged in user */
-    const posts = await Post.findAll({ where: { ownerId: userId } })
+    const posts = await Post.findAll({ where: { ownerId } })
     res.status(200).send(posts);
   } catch (error) {
     console.log(error);
     next(error)
   }
-
 })
 
 
+/* Allow user to edit their post */
+
+
+
+/* Gets all users */
 app.get('/users', async (req, res, next) => {
   try {
     const users = await User.findAll();
-    res.json(users);
+    res.status(200).send(users);
   } catch (error) {
     console.error(error);
     next(error);
   }
 })
 
+/* User can delete a single post */
 
 
 
