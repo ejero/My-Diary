@@ -1,16 +1,14 @@
 const express = require('express');
 const app = express();
 const { sequelize } = require('./database/db');
-const { User } = require('../backend/database/User');
-const { Post } = require('../backend/database/Post');
+const { User, Post } = require('./database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const dotenv = require('dotenv');
+require('dotenv').config();
 
-dotenv.config();
 const secret = process.env.JWT_SECRET;
-const { PORT = 4003 } = process.env;
+const { PORT = 4004 } = process.env;
 
 // Salt count
 const SALT_COUNT = 10;
@@ -25,17 +23,16 @@ app.use(express.urlencoded({ extended: true }))
 const setUser = ((req, res, next) => {
   const auth = req.header('Authorization');
   if (!auth) {
-    res.sendStatus(401);
-    next();
+    return
   } else {
     const [, token] = auth.split(' ');
     try {
-      const userObj = jwt.verify(token, JWT_SECRET);
+      const userObj = jwt.verify(token, process.env.JWT_SECRET);
       req.user = userObj;
       next();
     } catch (error) {
-      res.sendStatus(401);
-      next();
+      console.error(error.message);
+      throw new Error('Invalid token')
     }
   }
 })
@@ -75,7 +72,7 @@ app.post('/register', async (req, res) => {
 // Alows a usr to login 
 app.post('/login', async (req, res, next) => {
   try {
-    const { email, password, firstName } = req.body;
+    const { email, password } = req.body;
     const foundUser = await User.findOne({ where: { email } });
 
     if (!foundUser) {
@@ -83,7 +80,7 @@ app.post('/login', async (req, res, next) => {
       return;
     }
 
-    const loginMessage = `successfully logged in user ${foundUser.firstname}`
+    const loginMessage = `successfully logged in user ${foundUser.email}`
     const isMatch = await bcrypt.compare(password, foundUser.password);
 
     if (isMatch) {
@@ -104,15 +101,44 @@ app.post('/login', async (req, res, next) => {
 /** One user can have many posts */
 app.post('/posts', setUser, async (req, res, next) => {
   // Require a user and set the post's ownerID
-
   const { title, author, content, date } = req.body;
   const post = await Post.create({ title, author, content, date, ownerId: req.user.id });
 
   if (!req.user) {
     res.sendStatus(401)
-    next()
+    return
   } else {
+    console.log(post);
     res.status(201).send({ title: post.title, author: post.author, content: post.content, data: post.date });
+  }
+})
+
+/* User can view all their posts */
+app.get('/posts/:userId', setUser, async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    if (userId !== req.user.id) {
+      res.sendStatus(401)
+      return;
+    }
+    /* Find all, retrive all post from user with ownerId of same logged in user */
+    const posts = await Post.findAll({ where: { ownerId: userId } })
+    res.status(200).send(posts);
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+
+})
+
+
+app.get('/users', async (req, res, next) => {
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 })
 

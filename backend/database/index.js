@@ -1,4 +1,4 @@
-const { Post } = require('./Cupcake');
+const { Post } = require('./Post');
 const { User } = require('./User');
 const { sequelize, Sequelize } = require('./db');
 
