@@ -31,8 +31,10 @@ const setUser = ((req, res, next) => {
       req.user = userObj;
 
       // Sets the owner id from an authenticated user
-      // req.params.ownerId = userObj.id;
-      req.params.ownerId = req.params.ownerId || userObj.id;
+      if (!req.params.ownerId) {
+        req.params.ownerId = userObj.id;
+      }
+      // req.params.ownerId = req.params.ownerId || userObj.id;
       next();
     } catch (error) {
       console.error(error.message);
@@ -177,7 +179,7 @@ app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
     }
 
     // Check if the user owns the post
-    if (post.ownerId !== req.user.ownerId) {
+    if (post.ownerId !== req.user.id) {
       res.sendStatus(401)
       return;
     }
