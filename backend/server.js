@@ -31,7 +31,8 @@ const setUser = ((req, res, next) => {
       req.user = userObj;
 
       // Sets the owner id from an authenticated user
-      req.params.ownerId = userObj.id;
+      // req.params.ownerId = userObj.id;
+      req.params.ownerId = req.params.ownerId || userObj.id;
       next();
     } catch (error) {
       console.error(error.message);
@@ -56,6 +57,18 @@ app.get('/', async (req, res, next) => {
     next(error)
   }
 });
+
+
+/* Gets all users */
+app.get('/users', async (req, res, next) => {
+  try {
+    const users = await User.findAll();
+    res.status(200).send(users);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+})
 
 /* Reqister All Posts */
 app.post('/register', async (req, res) => {
@@ -152,19 +165,39 @@ app.get('/posts/:ownerId', setUser, async (req, res, next) => {
 
 
 /* Allow user to edit their post */
+app.put('posts/:ownerId/:postId', setUser, async (req, res, next) => {
+  const { ownerId, postId } = req.params;
+  const { title, content } = req.body;
 
-
-
-/* Gets all users */
-app.get('/users', async (req, res, next) => {
   try {
-    const users = await User.findAll();
-    res.status(200).send(users);
+    // Looking for a post by id and postId
+    const post = await Post.findOne({ where: { id: postId, ownerId } });
+    if (!post) {
+      res.sendStatus(404);
+    }
+
+    // Check if the user owns the post
+    if (post.ownerId !== req.user.ownerId) {
+      res.sendStatus(401)
+      return;
+    }
+
+    // Update and save the updated content
+    await post.update({ title, content })
+
+    // Save post
+    // await post.save();
+
+    res.json(({ mesage: 'Post updated Woo hoo!', post: post }))
   } catch (error) {
-    console.error(error);
+    console.log(error.mesage);
+    res.sendStatus(500);
     next(error);
   }
+
 })
+
+
 
 /* User can delete a single post */
 
