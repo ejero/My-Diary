@@ -165,6 +165,36 @@ app.get('/posts/:ownerId', setUser, async (req, res, next) => {
 })
 
 
+
+/* Allow use to read one post */
+app.get('/posts/:ownerId/:postId', async (req, res, next) => {
+  const { ownerId, postId } = req.params;
+
+  try {
+
+    const post = await Post.findOne({ where: { id: postId, ownerId } })
+    if (!post) {
+      res.sendStatus(404)
+    }
+
+    // Check if the user owns the post
+    if (post.ownerId !== req.user.id) {
+      res.sendStatus(401)
+      return;
+    }
+
+    //res.status(200).send(post);
+    res.json({ post: post })
+
+  } catch (error) {
+    console.log(error.mesage);
+    res.sendStatus(500);
+    next(error);
+  }
+})
+
+
+
 /* Allow user to edit their post */
 app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
   const { ownerId, postId } = req.params;
@@ -197,6 +227,8 @@ app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
   }
 
 })
+
+
 
 
 /* User can delete a single post */
