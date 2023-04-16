@@ -168,15 +168,15 @@ app.get('/viewposts/:ownerId', setUser, async (req, res, next) => {
     }
 
     // If user found matches the id
-    if (user.id !== req.user.id && req.user.role !== 'admin') {
+    if (user.id === req.user.id || req.user.role === 'admin') {
+      /* Find all, retrive all post from user with ownerId of same logged in user */
+      const posts = await Post.findAll({ where: { ownerId } })
+      res.status(200).send(posts);
+    } else {
       console.log(req.user);
-      res.sendStatus(401)
+      res.sendStatus(401);
       return;
     }
-
-    /* Find all, retrive all post from user with ownerId of same logged in user */
-    const posts = await Post.findAll({ where: { ownerId } })
-    res.status(200).send(posts);
   } catch (error) {
     console.log(error);
     next(error)
