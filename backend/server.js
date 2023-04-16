@@ -248,6 +248,38 @@ app.put('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
 })
 
 
+// Edit user info
+app.put('/edituser/:ownerId', setUser, async (req, res, next) => {
+  const { username, password, email } = req.body;
+  const ownerId = req.params.ownerId;
+
+  const user = await User.findOne({ where: { id: ownerId } })
+
+  // If user is not found by id
+  if (!user) {
+    res.sendStatus(404);
+    return;
+  }
+
+  try {
+
+    // Check if the user is same as user id or admin
+    if (user.ownerId === req.user.id || req.user.role === 'admin') {
+      // Update and save the updated content
+      await user.update({ username, password, email })
+    } else {
+      res.sendStatus(401)
+      return;
+    }
+
+    res.json(({ mesage: 'User info updated Woo hoo!', user: user }))
+  } catch (error) {
+    console.log(error.mesage);
+    res.sendStatus(500);
+    next(error);
+  }
+
+})
 
 
 /* User can delete a single post */
