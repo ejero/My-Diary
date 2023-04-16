@@ -292,13 +292,14 @@ app.delete('/users/:id', setUser, async (req, res, next) => {
       res.sendStatus(404)
       return;
     }
-    if (user.id !== req.user.id) {
+    if (user.id == req.user.id || req.user.role === 'admin') {
+      // Delete the user that was found and send message
+      await user.destroy();
+      res.json({ mesage: 'User has been deleted' })
+    } else {
       res.sendStatus(401)
     }
 
-    // Delete the user that was found and send message
-    await user.destroy();
-    res.json({ mesage: 'User has been deleted' })
 
   } catch (error) {
     console.log(error.mesage)
