@@ -264,7 +264,7 @@ app.put('/edituser/:ownerId', setUser, async (req, res, next) => {
   try {
 
     // Check if the user is same as user id or admin
-    if (user.ownerId === req.user.id || req.user.role === 'admin') {
+    if (user.id === req.user.id || req.user.role === 'admin') {
       // Update and save the updated content
       await user.update({ username, password, email })
     } else {
