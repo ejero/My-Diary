@@ -37,8 +37,10 @@ const setUser = ((req, res, next) => {
       // Check if user role is admin with isAdmin custom property
       if (userObj.role === 'admin') {
         req.isAdmin = true;
+        console.log("Is this the admin:", req.isAdmin);
       } else {
         req.isAdmin = false;
+        console.log("Is this the admin:", req.isAdmin);
       }
       next();
     } catch (error) {
@@ -89,7 +91,7 @@ app.post('/register', async (req, res) => {
   const { username, password, email, firstName, role } = req.body;
   try {
     const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-    const createdUser = await User.create({ username, password: hashedPw, email, firstName, role: "user" });
+    const createdUser = await User.create({ username, password: hashedPw, email, firstName, role });
     const token = jwt.sign({ id: createdUser.id, username, email, firstName, role }, process.env.JWT_SECRET);
     res.send({ message: 'Success, user created!', token });
   } catch (error) {
@@ -166,7 +168,7 @@ app.get('/viewposts/:ownerId', setUser, async (req, res, next) => {
     }
 
     // If user found matches the id
-    if (user.id !== req.user.id) {
+    if (user.id !== req.user.id && req.user.role !== 'admin') {
       console.log(req.user);
       res.sendStatus(401)
       return;
