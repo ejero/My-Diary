@@ -34,7 +34,12 @@ const setUser = ((req, res, next) => {
       if (!req.params.ownerId) {
         req.params.ownerId = userObj.id;
       }
-      // req.params.ownerId = req.params.ownerId || userObj.id;
+      // Check if user role is admin with isAdmin custom property
+      if (userObj.role === 'admin') {
+        req.isAdmin = true;
+      } else {
+        req.isAdmin = false;
+      }
       next();
     } catch (error) {
       console.error(error.message);
@@ -61,12 +66,19 @@ app.get('/', async (req, res, next) => {
 
 
 /* Gets all users */
-app.get('/users', async (req, res, next) => {
+app.get('/users', setUser, async (req, res, next) => {
+  const user = req.user;
+
+  // Only admin can access all users
+  if (!user || req.isAdmin == false) {
+    return res.status(401).json({ error: 'Unaurthorized' })
+  }
   try {
     const users = await User.findAll();
     res.status(200).send(users);
   } catch (error) {
-    console.error(error);
+    console.error(error.mesage);
+    res.status(500).json({ mesage: 'Error' })
     next(error);
   }
 })
@@ -74,11 +86,11 @@ app.get('/users', async (req, res, next) => {
 /* Reqister All Posts */
 app.post('/register', async (req, res) => {
   /* Takes req.body of {username, password} and creates a new user with the hashed password */
-  const { username, password, email, firstName } = req.body;
+  const { username, password, email, firstName, role } = req.body;
   try {
     const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-    const createdUser = await User.create({ username, password: hashedPw, email, firstName });
-    const token = jwt.sign({ id: createdUser.id, username, email, firstName }, process.env.JWT_SECRET);
+    const createdUser = await User.create({ username, password: hashedPw, email, firstName, role: "user" });
+    const token = jwt.sign({ id: createdUser.id, username, email, firstName, role }, process.env.JWT_SECRET);
     res.send({ message: 'Success, user created!', token });
   } catch (error) {
     console.log(error)
@@ -122,7 +134,7 @@ app.post('/login', async (req, res, next) => {
 
 // Allows a user to make a post only to their account 
 /** One user can have many posts */
-app.post('/posts', setUser, async (req, res, next) => {
+app.post('/createpost', setUser, async (req, res, next) => {
   /* 
   By using setUser, user will not be able to make a post if 
   token is not valid
@@ -142,7 +154,7 @@ app.post('/posts', setUser, async (req, res, next) => {
 })
 
 /* User can view all their posts */
-app.get('/posts/:ownerId', setUser, async (req, res, next) => {
+app.get('/viewposts/:ownerId', setUser, async (req, res, next) => {
   try {
     const ownerId = req.params.ownerId;
     const user = await User.findOne({ where: { id: ownerId } })
@@ -172,18 +184,16 @@ app.get('/posts/:ownerId', setUser, async (req, res, next) => {
 
 
 /* Allow use to read one post */
-app.get('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
+app.get('/singlepost/:ownerId/:postId', setUser, async (req, res, next) => {
   const { ownerId, postId } = req.params;
-
   try {
-
     const post = await Post.findOne({ where: { id: postId, ownerId } })
     if (!post) {
       res.sendStatus(404)
     }
 
-    // Check if the user owns the post
-    if (post.ownerId !== req.user.id) {
+    // Check if the user owns the post or if user is admin
+    if (post.ownerId !== req.user.id && !req.isAdmin) {
       console.log(post.ownerId);
       console.log(ownerId);
       res.sendStatus(401)
@@ -249,8 +259,8 @@ app.delete('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
       res.sendStatus(404);
     }
 
-    // Check if the user owns found post
-    if (post.ownerId !== req.user.id) {
+    // Check if the user owns found post or if user is admin
+    if (post.ownerId !== req.user.id && !req.isAdmin) {
       res.sendStatus(401)
       return;
     }
