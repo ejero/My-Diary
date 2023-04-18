@@ -6,6 +6,7 @@
 > A Diary application that allows users to write down all their thoughts.
 
 ### Please note to install the client or backend you will need to be in the folder before you run npm install. 
+### Please create a .env file in the root of the backened with JWT_SECRET"
 
 ## Install
 
