@@ -1,0 +1,39 @@
+body {
+  margin: 0;
+}
+.loginContainer {
+  margin-left: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* gap: 20px; */
+  height: 100vh;
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+}
+
+.rightColumn {
+  align-self: center;
+}
+
+.image {
+  height: 100vh;
+  width: 55vw;
+}
+
+.btn {
+  background-color: rgb(0, 184, 156);
+}
+.links {
+  color: rgb(0, 184, 156);
+}
