@@ -50,6 +50,15 @@ const setUser = ((req, res, next) => {
   }
 })
 
+// Check if user us logged in
+const isLoggedIn = ((req, res, next) => {
+  if (!req.usr) {
+    return res.status(401).send({ message: 'You must login to make a post' })
+  } else {
+    next();
+  }
+})
+
 // Route Handlers 
 
 // Get
@@ -89,7 +98,22 @@ app.get('/users', setUser, async (req, res, next) => {
 app.post('/register', async (req, res) => {
   /* Takes req.body of {username, password} and creates a new user with the hashed password */
   const { username, password, email, firstName, role } = req.body;
+
+  if (!username) {
+    return res.status(400).send({ mesage: "Please enter a username" })
+  }
+  if (!password) {
+    return res.status(400).send({ mesage: "Please enter a password" })
+  }
+  if (!email) {
+    return res.status(400).send({ mesage: "Please enter an email" })
+  }
+  if (!firstName) {
+    return res.status(400).send({ mesage: "Please enter a firstname" })
+  }
+
   try {
+
     const hashedPw = await bcrypt.hash(password, SALT_COUNT);
     const createdUser = await User.create({ username, password: hashedPw, email, firstName, role });
     const token = jwt.sign({ id: createdUser.id, username, email, firstName, role }, process.env.JWT_SECRET);
@@ -103,8 +127,16 @@ app.post('/register', async (req, res) => {
 // Alows a usr to login 
 app.post('/login', async (req, res, next) => {
   // User can login by username or password
+
   try {
     const { emailOrUsername, password } = req.body;
+    if (!emailOrUsername) {
+      return res.sendStatus(400).send({ message: 'Please enter a username or email' })
+    }
+
+    if (!password) {
+      return res.sendStatus(400).send({ message: 'Please enter a password' })
+    }
     const foundUser = await User.findOne({
       where: Sequelize.or(
         { email: emailOrUsername },
@@ -121,7 +153,8 @@ app.post('/login', async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, foundUser.password);
 
     if (isMatch) {
-      res.status(200).send(loginMessage);
+      const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET);
+      res.status(200).send({ message: loginMessage, token });
     }
     if (!isMatch) {
       const notMatched = `Incorrect username or password`
@@ -136,23 +169,47 @@ app.post('/login', async (req, res, next) => {
 
 // Allows a user to make a post only to their account 
 /** One user can have many posts */
-app.post('/createpost', setUser, async (req, res, next) => {
+app.post('/createpost', setUser, isLoggedIn, async (req, res, next) => {
   /* 
   By using setUser, user will not be able to make a post if 
   token is not valid
   */
-
   // Require a user and set the post's ownerID
   const { title, author, content, date } = req.body;
-  const post = await Post.create({ title, author, content, date, ownerId: req.user.id });
 
-  if (!req.user) {
-    res.sendStatus(401)
-    return
-  } else {
-    console.log(post);
-    res.status(201).send({ title: post.title, author: post.author, content: post.content, data: post.date });
+  if (!title) {
+    return res.status(400).send({ message: "Please enter a title" });
   }
+  if (!author) {
+    return res.status(400).send({ message: "Please enter an author" });
+  }
+  if (!content) {
+    return res.status(400).send({ message: "Please enter content" });
+  }
+  if (!date) {
+    return res.status(400).send({ message: "Please enter a date" });
+  }
+
+  try {
+
+    const post = await Post.create({ title, author, content, date, ownerId: req.user.id });
+
+    if (!req.user) {
+      res.sendStatus(401)
+      return
+    } else {
+      console.log(post);
+      res.status(201).send({ title: post.title, author: post.author, content: post.content, data: post.date });
+    }
+
+
+  } catch (error) {
+    res.status(401).send("Error");
+    next(error);
+  }
+
+
+
 })
 
 /* User can view all their posts */

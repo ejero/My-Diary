@@ -5,7 +5,10 @@ const User = sequelize.define('user', {
   password: Sequelize.STRING,
   email: Sequelize.STRING,
   firstName: Sequelize.STRING,
-  role: Sequelize.STRING
+  role: {
+    type: Sequelize.STRING,
+    defaultValue: 'user',
+  }
 });
 
 module.exports = { User };
