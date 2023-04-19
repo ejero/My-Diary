@@ -23,13 +23,14 @@ app.use(express.urlencoded({ extended: true }))
 const setUser = ((req, res, next) => {
   const auth = req.header('Authorization');
   if (!auth) {
-    return
+    req.isLoggIn = false;
+    next();
   } else {
     const [, token] = auth.split(' ');
     try {
       const userObj = jwt.verify(token, process.env.JWT_SECRET);
       req.user = userObj;
-
+      console.log(userObj);
       // Sets the owner id from an authenticated user
       if (!req.params.ownerId) {
         req.params.ownerId = userObj.id;
@@ -42,6 +43,7 @@ const setUser = ((req, res, next) => {
         req.isAdmin = false;
         console.log("Is this the admin:", req.isAdmin);
       }
+      req.isLoggIn = true;
       next();
     } catch (error) {
       console.error(error.message);
@@ -51,13 +53,13 @@ const setUser = ((req, res, next) => {
 })
 
 // Check if user us logged in
-const isLoggedIn = ((req, res, next) => {
-  if (!req.usr) {
-    return res.status(401).send({ message: 'You must login to make a post' })
-  } else {
-    next();
-  }
-})
+// const isLoggedIn = ((req, res, next) => {
+//   if (!req.usr) {
+//     return res.status(401).send({ message: 'You must login to make a post' })
+//   } else {
+//     next();
+//   }
+// })
 
 // Route Handlers 
 
@@ -169,7 +171,11 @@ app.post('/login', async (req, res, next) => {
 
 // Allows a user to make a post only to their account 
 /** One user can have many posts */
-app.post('/createpost', setUser, isLoggedIn, async (req, res, next) => {
+app.post('/createpost', setUser, async (req, res, next) => {
+  // Confrim a user is logged in
+  if (!req.isLoggIn) {
+    return res.status(400).send({ message: "You must be logged in!" });
+  }
   /* 
   By using setUser, user will not be able to make a post if 
   token is not valid
