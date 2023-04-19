@@ -52,15 +52,6 @@ const setUser = ((req, res, next) => {
   }
 })
 
-// Check if user us logged in
-// const isLoggedIn = ((req, res, next) => {
-//   if (!req.usr) {
-//     return res.status(401).send({ message: 'You must login to make a post' })
-//   } else {
-//     next();
-//   }
-// })
-
 // Route Handlers 
 
 // Get
@@ -133,11 +124,11 @@ app.post('/login', async (req, res, next) => {
   try {
     const { emailOrUsername, password } = req.body;
     if (!emailOrUsername) {
-      return res.sendStatus(400).send({ message: 'Please enter a username or email' })
+      return res.status(400).send({ mesage: "Please enter a email or Username" })
     }
 
     if (!password) {
-      return res.sendStatus(400).send({ message: 'Please enter a password' })
+      return res.status(400).send({ message: 'Please enter a password' })
     }
     const foundUser = await User.findOne({
       where: Sequelize.or(
@@ -147,8 +138,7 @@ app.post('/login', async (req, res, next) => {
     })
 
     if (!foundUser) {
-      res.send(400).send("incorrect username or password");
-      return;
+      return res.status(401).send("incorrect username or password");
     }
 
     const loginMessage = `successfully logged in user ${foundUser.email}`
@@ -160,7 +150,7 @@ app.post('/login', async (req, res, next) => {
     }
     if (!isMatch) {
       const notMatched = `Incorrect username or password`
-      res.send(401).send(notMatched);
+      res.status(401).send(notMatched);
     }
   } catch (error) {
     const message = `Incorrect username or password`;
