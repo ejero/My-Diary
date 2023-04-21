@@ -90,7 +90,7 @@ app.get('/users', setUser, async (req, res, next) => {
 /* Reqister All Posts */
 app.post('/register', async (req, res) => {
   /* Takes req.body of {username, password} and creates a new user with the hashed password */
-  const { username, password, email, firstName, role } = req.body;
+  const { username, password, email, firstName } = req.body;
 
   if (!username) {
     return res.status(400).send({ mesage: "Please enter a username" })
@@ -108,8 +108,8 @@ app.post('/register', async (req, res) => {
   try {
 
     const hashedPw = await bcrypt.hash(password, SALT_COUNT);
-    const createdUser = await User.create({ username, password: hashedPw, email, firstName, role });
-    const token = jwt.sign({ id: createdUser.id, username, email, firstName, role }, process.env.JWT_SECRET);
+    const createdUser = await User.create({ username, password: hashedPw, email, firstName });
+    const token = jwt.sign({ id: createdUser.id, username, email, firstName, role: createdUser.role }, process.env.JWT_SECRET);
     res.send({ message: 'Success, user created!', token });
   } catch (error) {
     console.log(error)
@@ -347,7 +347,7 @@ app.delete('/posts/:ownerId/:postId', setUser, async (req, res, next) => {
     }
 
     // Check if the user owns found post or if user is admin
-    if (post.ownerId !== req.user.id && !req.isAdmin) {
+    if (post.ownerId !== req.user.id || !req.isAdmin) {
       res.sendStatus(401)
       return;
     }
