@@ -1,3 +1,17 @@
+.div6::-webkit-scrollbar {
+  width: 5px;
+  background-color: skyblue;
+}
+
+.div6::-webkit-scrollbar-thumb {
+  background-color: rgb(37, 140, 178);
+  border-radius: 10px;
+}
+
+.div6::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(27, 107, 136);
+}
+
 body {
   margin: 20px;
 }
@@ -42,7 +56,9 @@ body {
   outline: solid 3px black;
   overflow: scroll;
   overflow-x: hidden;
+  scrollbar-auto-hide: auto;
 }
+
 .div7 {
   grid-area: 7 / 3 / 8 / 4;
   background-color: thistle;
