@@ -37,4 +37,10 @@
 .div3 {
   grid-area: 1 / 3 / 2 / 4;
   background-color: #ffffff;
+  overflow-y: auto;
+}
+
+.quill {
+  /* Calc size of the tool bar for full screen */
+  height: calc(100vh - 42px);
 }
