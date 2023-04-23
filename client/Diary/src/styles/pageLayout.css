@@ -20,7 +20,7 @@
 .parent {
   display: grid;
   grid-template-columns: 0.4fr 0.6fr 2fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr 0.1fr;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
   height: 100vh;
@@ -28,18 +28,28 @@
 
 .div1 {
   grid-area: 1 / 1 / 2 / 2;
-  background-color: #07bb88;
+  background-color: #1d5dbc;
   color: #fff;
   font-size: 23px;
 }
 .div2 {
-  grid-area: 1 / 2 / 2 / 3;
+  grid-area: 1 / 2 / 3 / 3;
   background-color: rgb(247, 243, 244);
 }
 .div3 {
-  grid-area: 1 / 3 / 2 / 4;
+  grid-area: 1 / 3 / 3 / 4;
   background-color: rgb(244, 237, 240);
   overflow-y: auto;
+}
+
+.div4 {
+  grid-area: 2 / 1 / 3 / 2;
+  background-color: #1d5dbc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
 }
 
 .quill {
@@ -47,8 +57,13 @@
   height: calc(100vh - 42px);
 }
 
+.editIcon:hover {
+  color: #53d0d2;
+}
+
 .userName {
   margin-bottom: 20%;
+  font-size: 20px;
 }
 
 .leftNavBar {
@@ -74,4 +89,47 @@
 
 .divider {
   border-color: #fff;
+}
+
+.sideBottom {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* .bottom {
+  display: block;
+  align-items: center;
+}
+
+.logoutbtn {
+  color: #ffff;
+}
+
+.logoutbtn:hover {
+  color: #53d0d2;
+} */
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #eb6458;
+  padding: 10px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: bold;
+  border: none;
+  font-size: 25px;
+}
+
+.logoutIcon {
+  margin-left: 10px;
+}
+
+.logoutButton:hover {
+  background-color: aqua;
+  font-size: 26px;
+  color: rgb(27, 107, 136);
 }

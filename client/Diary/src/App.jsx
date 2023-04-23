@@ -1,19 +1,19 @@
 // import './App.css'
-import React, { useEffect, useState } from 'react';
-import Login from './pages/Login';
-import TextEditorField from './components/TextEditorField';
-import SideNavBar from './components/SideNavBar';
-import Paper from './components/Paper';
-import PageLayout from './pages/PageLayout';
+import React, { useEffect, useState } from "react";
+import Login from "./pages/Login";
+import PageLayout from "./pages/PageLayout";
+import { Router, Route, Routes } from "react-router-dom";
 function App() {
   const [isAuthenticated, setisAuthenticated] = useState(false);
+
   return (
     <div className="App">
-      <Login />
-      {/* <Paper /> */}
-      {/* <PageLayout /> */}
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/pageLayout" element={<PageLayout />} />
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
