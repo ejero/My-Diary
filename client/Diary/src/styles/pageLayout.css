@@ -98,19 +98,6 @@
   justify-content: flex-end;
 }
 
-/* .bottom {
-  display: block;
-  align-items: center;
-}
-
-.logoutbtn {
-  color: #ffff;
-}
-
-.logoutbtn:hover {
-  color: #53d0d2;
-} */
-
 .logoutButton {
   display: flex;
   align-items: center;
@@ -122,6 +109,7 @@
   font-weight: bold;
   border: none;
   font-size: 25px;
+  box-shadow: 1px 1px 7px rgb(139, 138, 140);
 }
 
 .logoutIcon {
@@ -131,5 +119,48 @@
 .logoutButton:hover {
   background-color: aqua;
   font-size: 26px;
-  color: rgb(27, 107, 136);
+  color: #1b6b88;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-wrapper {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 0.2fr 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  display: flex;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #add8e6;
+  padding: 10px;
+  border-radius: 2px;
+  color: #2260b9;
+  font-weight: bold;
+  border: none;
+  font-size: 19px;
+  width: 15rem;
+  height: 35px;
+  gap: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 7px rgb(195, 193, 193);
+}
+
+.addBtn:hover {
+  box-shadow: 1px 1px 10px rgb(153, 152, 152);
 }

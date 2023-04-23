@@ -7,13 +7,9 @@ import {
   IconArticle,
   IconTextPlus,
   IconLock,
-  IconLockOpen,
-  IconDots,
-  IconUserCircle,
-  IconDotsVertical,
-  IconPencil,
   IconEdit,
   IconLogout,
+  IconPlus,
 } from "@tabler/icons-react";
 import { Divider } from "antd";
 import ReactQuill from "react-quill";
@@ -56,10 +52,15 @@ const PageLayout = () => {
       </div>
       <div className="div2">
         <div className="list">
+          <button className="addBtn">
+            <span>Add Post </span>
+            <IconPlus classname="iconAdd" />
+          </button>
           <p>Title note</p>
           <p>Body of the note</p>
         </div>
       </div>
+
       <div className="div3">
         <ReactQuill className="quill" contentEditable="true" />
       </div>
