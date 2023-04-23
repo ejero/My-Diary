@@ -129,7 +129,7 @@ export function SideNavBar() {
 
   return (
     <>
-      <Navbar width={{ sm: 180 }} p="md" className={classes.navbar}>
+      <Navbar width={{ sm: 231 }} p="md" className={classes.navbar}>
         <Navbar.Section grow>
           <Group className={classes.header} position="apart">
             <p className={classes.linkIcon}>Diary.co</p>
