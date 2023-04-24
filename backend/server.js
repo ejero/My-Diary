@@ -72,7 +72,7 @@ app.get("/users", setUser, async (req, res, next) => {
   const user = req.user;
 
   // Only admin can access all users
-  if (!user || req.isAdmin == false) {
+  if (!user || user.role.isAdmin === false) {
     return res.status(401).json({ error: "Unaurthorized" });
   }
   try {
@@ -88,7 +88,7 @@ app.get("/users", setUser, async (req, res, next) => {
 /* Reqister All Posts */
 app.post("/register", async (req, res) => {
   /* Takes req.body of {username, password} and creates a new user with the hashed password */
-  const { username, password, email, firstName } = req.body;
+  const { username, password, email, firstName, role } = req.body;
 
   if (!username) {
     return res.status(400).send({ mesage: "Please enter a username" });
@@ -110,6 +110,7 @@ app.post("/register", async (req, res) => {
       password: hashedPw,
       email,
       firstName,
+      role,
     });
     const token = jwt.sign(
       {
@@ -117,7 +118,7 @@ app.post("/register", async (req, res) => {
         username,
         email,
         firstName,
-        role: createdUser.role,
+        role,
       },
       process.env.JWT_SECRET
     );
