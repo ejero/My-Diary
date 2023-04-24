@@ -163,7 +163,15 @@ app.post("/login", async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, foundUser.password);
 
     if (isMatch) {
-      const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET);
+      const tokenPayload = {
+        id: foundUser.id,
+        email: foundUser.email,
+        firstName: foundUser.firstName,
+        ownerId: foundUser.ownerId,
+        role: foundUser.role,
+      };
+      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
+
       res
         .status(200)
         .send({ message: loginMessage, token, firstName: foundUser.firstName });
@@ -207,6 +215,7 @@ app.post("/createpost", setUser, async (req, res, next) => {
   }
 
   try {
+    const user = await User.findByPk(req.user.id);
     const post = await Post.create({
       title,
       author,
@@ -225,6 +234,9 @@ app.post("/createpost", setUser, async (req, res, next) => {
         author: post.author,
         content: post.content,
         data: post.date,
+        ownerId: post.ownerId,
+        email: user.email,
+        firstName: user.firstName,
       });
     }
   } catch (error) {
@@ -237,7 +249,9 @@ app.post("/createpost", setUser, async (req, res, next) => {
 app.get("/viewposts/:ownerId", setUser, async (req, res, next) => {
   try {
     const ownerId = req.params.ownerId;
-    const user = await User.findOne({ where: { id: ownerId } });
+    const user = await User.findOne({
+      where: { id: ownerId },
+    });
 
     // If user is not found by id
     if (!user) {
@@ -367,9 +381,14 @@ app.delete("/posts/:ownerId/:postId", setUser, async (req, res, next) => {
       return;
     }
 
+    const deletedPostId = post.id;
     // Delete the found post
     await post.destroy();
-    res.json({ message: "Post has been deleted!", post: post });
+    res.json({
+      message: "Post has been deleted!",
+      post: post,
+      postId: deletedPostId,
+    });
   } catch (error) {
     console.log(error.mesage);
     res.sendStatus(500);

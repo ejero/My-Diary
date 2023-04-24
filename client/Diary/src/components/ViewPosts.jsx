@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Card, Modal } from "antd";
 import { IconTrash, IconEdit } from "@tabler/icons-react";
-//import jwt_decode from "jwt-decode";
+import jwt_decode from "jwt-decode";
 
 function ViewPosts() {
   const [posts, setPosts] = useState([]);
@@ -9,6 +10,12 @@ function ViewPosts() {
   const [expandedCardId, setExpandedCardId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const { postId } = useParams();
+
+  const token = localStorage.getItem("token");
+  const decodedToken = jwt_decode(token);
+  // const ownerId = 16;
+  const ownerId = decodedToken.id;
 
   const handleCardClick = (post) => {
     showModal(post);
@@ -25,9 +32,21 @@ function ViewPosts() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    // const decodedToken = jwt_decode(token);
-    const ownerId = 16;
+    async function fetchPost() {
+      try {
+        const response = await fetch(`/singlepost/${ownerId}/${postId}`);
+        const data = await response.json();
+        setPosts(data.posts);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchPost();
+  }, [ownerId, postId]);
+
+  useEffect(() => {
+    console.log("decoded token", decodedToken);
+    console.log("ownerId", ownerId);
 
     const fetchPosts = async () => {
       try {
@@ -54,6 +73,24 @@ function ViewPosts() {
     fetchPosts();
   }, []);
 
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/posts/${ownerId}/${postId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error! Response Error");
+      }
+      // Update state or do something else
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -78,9 +115,7 @@ function ViewPosts() {
                 marginBottom: "16px",
                 boxShadow: "0px 0px 5px 0px #dcdcdc",
               }}
-              title={
-                <div onClick={() => handleCardClick(post)}>{post.title}</div>
-              }
+              title={post.title}
               headStyle={{ backgroundColor: "#AFD8E5", color: "DarkBlue" }}
               bodyStyle={{ padding: "8px" }}
             >
@@ -93,6 +128,7 @@ function ViewPosts() {
                     size={20}
                     key="delete"
                     style={{ color: "red", marginRight: "10px" }}
+                    onClick={handleDelete}
                   />
                   <IconEdit size={20} key="edit" style={{ color: "gray" }} />
                 </div>
