@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Modal } from "antd";
+import { Card, Modal, Divider } from "antd";
 import { IconTrash, IconEdit } from "@tabler/icons-react";
 import jwt_decode from "jwt-decode";
 
@@ -97,53 +97,50 @@ function ViewPosts() {
 
   return (
     <>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "16px",
-            justifyContent: "center",
-            paddingTop: "24px",
-          }}
-        >
-          {posts.map((post) => (
-            <Card
-              key={post.id}
+      <div className="viewContainer">
+        {posts.map((post) => (
+          <div
+            key={post.id}
+            style={{
+              marginBottom: "1px",
+              boxShadow: "0px 0px 5px 0px #dcdcdc",
+            }}
+          >
+            <p
               style={{
-                width: 255,
-                marginBottom: "16px",
-                boxShadow: "0px 0px 5px 0px #dcdcdc",
+                backgroundColor: "#AFD8E5",
+                color: "DarkBlue",
+                padding: "8px",
+                fontWeight: "bold",
               }}
-              title={post.title}
-              headStyle={{ backgroundColor: "#AFD8E5", color: "DarkBlue" }}
-              bodyStyle={{ padding: "8px" }}
             >
-              {expandedCardId === post.id ? (
-                <p>{post.content}</p>
-              ) : (
-                <div>
-                  <p>{post.content.split(" ").slice(0, 25).join(" ")}...</p>
-                  <IconTrash
-                    size={20}
-                    key="delete"
-                    style={{ color: "red", marginRight: "10px" }}
-                    onClick={handleDelete}
-                  />
-                  <IconEdit size={20} key="edit" style={{ color: "gray" }} />
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-        {selectedPost && (
-          <Modal open={isModalOpen} onClose={handleCancel}>
-            <Modal.Title>{selectedPost.title}</Modal.Title>
-            <Modal.Content>
-              <p>{selectedPost.content}</p>
-            </Modal.Content>
-          </Modal>
-        )}
+              {post.title}
+            </p>
+            {/* <p style={{ padding: "3px" }}>{post.content}</p> */}
+            <p
+              style={{
+                marginBottom: "2px",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+              }}
+            >
+              {post.content.split(" ").slice(0, 18).join(" ")}
+            </p>
+            <IconTrash
+              size={20}
+              key="delete"
+              style={{
+                color: "red",
+                marginRight: "10px",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+              }}
+              onClick={handleDelete}
+            />
+            <IconEdit size={20} key="edit" style={{ color: "gray" }} />
+            <Divider />
+          </div>
+        ))}
       </div>
     </>
   );

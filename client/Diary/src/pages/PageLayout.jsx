@@ -11,14 +11,15 @@ import {
   IconEdit,
   IconLogout,
   IconPlus,
+  IconDeviceFloppy,
 } from "@tabler/icons-react";
 import { Divider } from "antd";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Popover } from "antd";
-import { Card } from "antd";
+import { Button, Space } from "antd";
 
 const PageLayout = () => {
+  const [contents, setContents] = useState("");
   const firstName = localStorage.getItem("firstName");
 
   const content = (
@@ -36,6 +37,37 @@ const PageLayout = () => {
     navigate("/");
   };
 
+  const handleClick = () => {
+    // Code to save the content
+  };
+
+  const handleChange = (value) => {
+    setContents(value);
+  };
+
+  const handleSave = () => {
+    // Do something with the content...
+  };
+
+  const modules = {
+    toolbar: [
+      // Your existing toolbar options...
+      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ size: [] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      ["link", "image", "video"],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ["clean"],
+    ],
+  };
+
   return (
     <div className="parent">
       <div class="div1">
@@ -49,6 +81,9 @@ const PageLayout = () => {
           </Divider>
           <div className="sideBottom">
             <p>Categories</p>
+            <p>
+              <IconPlus />
+            </p>
           </div>
         </div>
       </div>
@@ -65,53 +100,22 @@ const PageLayout = () => {
         </button>
       </div>
       <div class="div4">
-        <h4>Title</h4>
-        <p>Content</p>
+        <ViewPosts />
       </div>
-      <div class="div5"> <ViewPosts/> </div>
-      <div class="div6"> 6 </div>
-
-      {/* <div className="div1">
-        <div className="leftNavBar">
-          <div className="nameinfo">
-            <p className="userName"> Hello, {firstName}</p>
-            <IconEdit className="editIcon" />
-          </div>
-          <Divider style={{ borderColor: "white" }} className="divider">
-            <IconArticle style={{ color: "white" }} />
-          </Divider>
-          <div className="sideBottom">
-            <p>Categories</p>
-          </div>
+      <div class="div5">
+        <ReactQuill
+          className="quill"
+          contentEditable="true"
+          value={contents}
+          onChange={handleChange}
+          modules={modules}
+        />
+        <div style={{ textAlign: "center" }}>
+          <Button type="primary" style={{ width: "700px" }}>
+            Save
+          </Button>
         </div>
       </div>
-      <div className="div2">
-        <div className="list">
-          <div className="btnItem">
-            <button className="addBtn">
-              <span>Add Post </span>
-              <IconPlus classname="iconAdd" />
-            </button>
-          </div>
-          <div className="listItems">
-            <p>Title note</p>
-            <p>Body of the note</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="div3">
-        <ReactQuill className="quill" contentEditable="true" />
-        <button className="quullBtn" onClick={() => handleSaveClick()}>
-          Save
-        </button>
-      </div>
-      <div className="div4" onClick={handleLogout}>
-        <button className="logoutButton">
-          <span>Logout</span>
-          <IconLogout className="logoutIcon" />
-        </button>
-      </div> */}
     </div>
   );
 };
