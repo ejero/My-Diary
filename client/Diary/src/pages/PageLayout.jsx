@@ -70,7 +70,7 @@ const PageLayout = () => {
 
   return (
     <div className="parent">
-      <div class="div1">
+      <div className="div1">
         <div className="leftNavBar">
           <div className="nameinfo">
             <p className="userName"> Hello, {firstName}</p>
@@ -87,22 +87,22 @@ const PageLayout = () => {
           </div>
         </div>
       </div>
-      <div class="div2">
+      <div className="div2">
         <button className="addBtn">
           <span>Add Post </span>
           <IconPlus classname="iconAdd" />
         </button>
       </div>
-      <div class="div3" onClick={handleLogout}>
+      <div className="div3" onClick={handleLogout}>
         <button className="logoutButton">
           <span>Logout</span>
           <IconLogout className="logoutIcon" />
         </button>
       </div>
-      <div class="div4">
+      <div className="div4">
         <ViewPosts />
       </div>
-      <div class="div5">
+      <div className="div5">
         <ReactQuill
           className="quill"
           contentEditable="true"

@@ -108,8 +108,8 @@ function ViewPosts() {
           >
             <p
               style={{
-                backgroundColor: "#AFD8E5",
-                color: "DarkBlue",
+                backgroundColor: "#3355B2",
+                color: "#ECF1FF",
                 padding: "8px",
                 fontWeight: "bold",
               }}
