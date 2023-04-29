@@ -65,7 +65,7 @@ const Login = () => {
                     fontWeight: 900,
                   })}
                 >
-                  Welcome to My Diary.co
+                  Welcome to My Diary.co!
                 </Title>
                 <Text color="dimmed" align="center" mt={5}>
                   Keep track of your inner most private thoughts!
